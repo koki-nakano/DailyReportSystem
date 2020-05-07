@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DailyReportSystem.Models;
+using Microsoft.Owin.Logging;
 
 namespace DailyReportSystem.Controllers
 {
@@ -17,7 +18,25 @@ namespace DailyReportSystem.Controllers
         // GET: Employees
         public ActionResult Index()
         {
-            return View(db.Users.ToList());
+            //ビューに送る為のEmployeesIndexViewModelのリストを作成
+            List<EmployeesIndexViewModel> employees = new List<EmployeesIndexViewModel>();
+            //ユーザ一覧を、作成日時が最近のものから順にしてリストとして取得
+            List<ApplicationUser> users = db.Users.OrderByDescending(u => u.CreatedAt).ToList();
+            //ユーザのリストをEmployeeIndexViewModelのリストに変換
+            foreach (ApplicationUser applicationUser in users) {
+                //EmployeeIndexViewModelをApplicationUsersから必要なプロパティだけ抜き出して作成
+                EmployeesIndexViewModel employee = new EmployeesIndexViewModel
+                {
+                    Email = applicationUser.Email,
+                    EmployeeName = applicationUser.EmployeeName,
+                    DeleteFlg = applicationUser.DeleteFlg,
+                    Id = applicationUser.Id
+                };
+                //作成したEmployeesIndexViewModelをリストに追加
+                employees.Add(employee);
+            }
+            //作成したリストをIndexビューに送る
+            return View(employees);
         }
 
         // GET: Employees/Details/5
