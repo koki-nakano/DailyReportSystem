@@ -222,7 +222,16 @@ namespace DailyReportSystem.Controllers
             {
                 return HttpNotFound();
             }
-            return View(applicationUser);
+            //ビューモデルにデータを詰め替える
+            EmployeeDeleteViewModel employee = new EmployeeDeleteViewModel
+            {
+                Id = applicationUser.Id,
+                Email = applicationUser.Email,
+                EmployeeName = applicationUser.EmployeeName,
+                CreatedAt = applicationUser.CreatedAt,
+                UpdatedAt = applicationUser.UpdatedAt
+            };
+            return View(employee);
         }
 
         // POST: Employees/Delete/5
@@ -230,10 +239,17 @@ namespace DailyReportSystem.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(string id)
         {
+            //DBからidで検索して該当するユーザを取得
             ApplicationUser applicationUser = db.Users.Find(id);
-            db.Users.Remove(applicationUser);
+            //ユーザを論理削除
+            applicationUser.DeleteFlg = 1;
+            //StateをModifiedにしてUPDATE文を行うように設定
+            db.Entry(applicationUser).State = EntityState.Modified;
             db.SaveChanges();
-            return RedirectToAction("Index");
+            //TempDataにフラッシュメッセージを入れておくTempDataは現在のリクエストと次のリクエストまで存在
+            TempData["flush"] = String.Format("{0}さんの情報を削除しました", applicationUser.EmployeeName);
+
+            return RedirectToAction("Index", "Employees");
         }
 
         protected override void Dispose(bool disposing)
