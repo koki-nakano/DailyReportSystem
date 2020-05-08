@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity.EntityFramework;
-
+using Microsoft.SqlServer.Server;
 
 namespace DailyReportSystem.Models
 {
@@ -73,5 +73,23 @@ namespace DailyReportSystem.Models
         [DisplayName("権限")]
         [Required(ErrorMessage = "権限を選択してください")]
         public RolesEnum? AdminFlag { get; set; }
+    }
+
+    public class EmployeeDetailsViewModel {
+        public string Id { get; set; }
+
+        [DisplayName("メールアドレス")]
+        public string Email { get; set; }
+        [DisplayName("氏名")]
+        public string EmployeeName { get; set; }
+
+        [DisplayName("登録日時")]
+        public DateTime? CreatedAt { get; set; }
+
+        [DisplayName("更新日時")]
+        public DateTime? UpdatedAt { get; set; }
+
+        [DisplayName("権限")]
+        public  string  Role { get; set; }
     }
 }

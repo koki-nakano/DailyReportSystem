@@ -91,7 +91,16 @@ namespace DailyReportSystem.Controllers
             {
                 return HttpNotFound();
             }
-            return View(applicationUser);
+            EmployeeDetailsViewModel employee = new EmployeeDetailsViewModel
+            {
+                Id = applicationUser.Id,
+                Email = applicationUser.Email,
+                EmployeeName = applicationUser.EmployeeName,
+                CreatedAt = applicationUser.CreatedAt,
+                UpdatedAt = applicationUser.UpdatedAt
+            };
+
+            return View(employee);
         }
 
         // GET: Employees/Create
