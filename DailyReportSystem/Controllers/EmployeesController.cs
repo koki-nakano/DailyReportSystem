@@ -101,6 +101,9 @@ namespace DailyReportSystem.Controllers
                 UpdatedAt = applicationUser.UpdatedAt
             };
 
+            //RoleがAdminかどうか確認し、そうなら管理者、違うなら一般にする
+            employee.Role = UserManager.IsInRole(applicationUser.Id, "Admin") ?
+                "管理者" : "一般";
             return View(employee);
         }
 
@@ -283,6 +286,7 @@ namespace DailyReportSystem.Controllers
                 CreatedAt = applicationUser.CreatedAt,
                 UpdatedAt = applicationUser.UpdatedAt
             };
+
             return View(employee);
         }
 
