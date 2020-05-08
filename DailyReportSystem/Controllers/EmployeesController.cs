@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity.EntityFramework;
+using DailyReportSystem.Migrations;
 
 namespace DailyReportSystem.Controllers
 {
@@ -119,7 +120,7 @@ namespace DailyReportSystem.Controllers
             if (ModelState.IsValid)
             {
                 //ビューから受け取ったEmployeesCreateViewModelからユーザ情報を作成
-                ApplicationUser applocationUser = new ApplicationUser
+                ApplicationUser applicationUser = new ApplicationUser
                 {
                     //IdentityアカウントのUserNameにはメールアドレスを入れる必要がある
                     UserName = model.Email,
@@ -131,11 +132,35 @@ namespace DailyReportSystem.Controllers
                 };
 
                 //ユーザ情報をDBに登録
-                var result = await UserManager.CreateAsync(applocationUser, model.Password);
+                var result = await UserManager.CreateAsync(applicationUser, model.Password);
                 //DB登録に成功した場合
+                // DB登録に成功した場合
                 if (result.Succeeded)
                 {
-                    TempData["flash"] = String.Format($"{applocationUser.EmployeeName}さんを登録しました。");
+                    // Roleを追加する
+                    var roleManager = new RoleManager<IdentityRole>(
+                        new RoleStore<IdentityRole>(new ApplicationDbContext())
+                        );
+
+
+                    // AdminロールがDBに存在しなければ
+                    if (!await roleManager.RoleExistsAsync("Admin"))
+                    {
+                        // AdminロールをDBに作成
+                        await roleManager.CreateAsync(new IdentityRole() { Name = "Admin" });
+                    }
+
+                    // mode.AdminFlagの内容によって、処理をswitchで変える。
+                    switch (model.AdminFlag)
+                    {
+                        case RolesEnum.Admin:
+                            // Adminロールをユーザーに対して設定
+                            await UserManager.AddToRoleAsync(applicationUser.Id, "Admin");
+                            break;
+                    }
+
+                    //フラッシュメッセージを入れておく
+                    TempData["flash"] = String.Format($"{applicationUser.EmployeeName}さんを登録しました。");
                     return RedirectToAction("Index", "Employees");
                 }
                 //DB登録に失敗したらエラー登録

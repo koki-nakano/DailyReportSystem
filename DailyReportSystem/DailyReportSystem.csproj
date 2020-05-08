@@ -181,6 +181,10 @@
     <Compile Include="Migrations\202005070426457_AddEmployeeProperties.Designer.cs">
       <DependentUpon>202005070426457_AddEmployeeProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202005080446210_AddAplication.cs" />
+    <Compile Include="Migrations\202005080446210_AddAplication.Designer.cs">
+      <DependentUpon>202005080446210_AddAplication.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\EmployeeViewModels.cs" />
@@ -261,6 +265,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202005070426457_AddEmployeeProperties.resx">
       <DependentUpon>202005070426457_AddEmployeeProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005080446210_AddAplication.resx">
+      <DependentUpon>202005080446210_AddAplication.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
