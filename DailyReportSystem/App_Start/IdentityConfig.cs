@@ -53,11 +53,12 @@ namespace DailyReportSystem
             // パスワードの検証ロジックを設定します
             manager.PasswordValidator = new PasswordValidator
             {
-                RequiredLength = 6,
-                RequireNonLetterOrDigit = true,
-                RequireDigit = true,
-                RequireLowercase = true,
-                RequireUppercase = true,
+                RequiredLength = 4,
+                //開発の為コメントアウト
+                //RequireNonLetterOrDigit = true,
+                //RequireDigit = true,
+                //RequireLowercase = true,
+                //RequireUppercase = true,
             };
 
             // ユーザー ロックアウトの既定値を設定します。

@@ -8,12 +8,52 @@ using System.Web;
 using System.Web.Mvc;
 using DailyReportSystem.Models;
 using Microsoft.Owin.Logging;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace DailyReportSystem.Controllers
 {
     public class EmployeesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+
+        //このアプリケーション用のユーザのサインインを管理するSignInManager
+        private ApplicationSignInManager _signInManager;
+
+        //このアプリケーション用のユーザ情報を管理するUserManager
+        private ApplicationUserManager _userManager;
+
+        public EmployeesController() { }
+
+        public EmployeesController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        {
+            UserManager = userManager;
+            SignInManager = signInManager;
+        }
+
+        public ApplicationSignInManager SignInManager
+        {
+            get
+            {
+                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+            }
+            private set
+            {
+                _signInManager = value;
+            }
+        }
+
+        public ApplicationUserManager UserManager {
+            get {
+                return _userManager ?? HttpContext.GetOwinContext().Get<ApplicationUserManager>();
+            }
+            set {
+                _userManager = value;
+            }
+        }
+
 
         // GET: Employees
         public ActionResult Index()
@@ -57,7 +97,7 @@ namespace DailyReportSystem.Controllers
         // GET: Employees/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new EmployeesCreateViewModel());
         }
 
         // POST: Employees/Create
@@ -65,17 +105,42 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,EmployeeName,CreatedAt,UpdatedAt,DeleteFlg,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")] ApplicationUser applicationUser)
+        public async Task<ActionResult>Create([Bind(Include = "EmployeeName,Email,Password,AdminFlag")] EmployeesCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
-                db.Users.Add(applicationUser);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+                //ビューから受け取ったEmployeesCreateViewModelからユーザ情報を作成
+                ApplicationUser applocationUser = new ApplicationUser
+                {
+                    //IdentityアカウントのUserNameにはメールアドレスを入れる必要がある
+                    UserName = model.Email,
+                    Email = model.Email,
+                    EmployeeName = model.EmployeeName,
+                    UpdatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    DeleteFlg = 0
+                };
 
-            return View(applicationUser);
+                //ユーザ情報をDBに登録
+                var result = await UserManager.CreateAsync(applocationUser, model.Password);
+                //DB登録に成功した場合
+                if (result.Succeeded)
+                {
+                    TempData["flash"] = String.Format($"{applocationUser.EmployeeName}さんを登録しました。");
+                    return RedirectToAction("Index", "Employees");
+                }
+                //DB登録に失敗したらエラー登録
+                AddErrors(result);
+            }
+            return View(model);
+         }
+        //エラーがある発生した場合エラーメッセージを追加する
+        private void AddErrors(IdentityResult result) {
+            foreach (var error in result.Errors) {
+                ModelState.AddModelError("", error);
+            }
         }
+     
 
         // GET: Employees/Edit/5
         public ActionResult Edit(string id)
@@ -89,7 +154,13 @@ namespace DailyReportSystem.Controllers
             {
                 return HttpNotFound();
             }
-            return View(applicationUser);
+            EmployeeEditViewModel employee = new EmployeeEditViewModel
+            {
+                Id = applicationUser.Id,
+                Email = applicationUser.Email,
+                EmployeeName = applicationUser.EmployeeName
+            };
+            return View(employee);
         }
 
         // POST: Employees/Edit/5
@@ -97,15 +168,37 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,EmployeeName,CreatedAt,UpdatedAt,DeleteFlg,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")] ApplicationUser applicationUser)
-        {
-            if (ModelState.IsValid)
-            {
+        public async Task<ActionResult>Edit([Bind(Include = "Id,Email,EmployeeName,Password,AdminFlag")]EmployeeEditViewModel employee) {
+            if (ModelState.IsValid) {
+                //DBからidのユーザを取得し検索、そのユーザに対し変更をする
+                ApplicationUser applicationUser = db.Users.Find(employee.Id);
+                //IdentityアカウントのUserNameにはメールアドレスを入れる必要がある
+                applicationUser.UserName = employee.Email;
+                applicationUser.Email = employee.Email;
+                applicationUser.EmployeeName = employee.EmployeeName;
+                applicationUser.UpdatedAt = DateTime.Now;
+                //Passwordが空でなければパスワードを変更する
+                if (!String.IsNullOrEmpty(employee.Password)) {
+                    //Passwordの入力検証
+                    var result = await UserManager.PasswordValidator.ValidateAsync(employee.Password);
+                    //Passwordの検証に失敗したら、エラーを追加しEditビューをもう一度描画
+                    if (!result.Succeeded) {
+                        AddErrors(result);
+                        return View(employee);
+                    }
+                    //Passwordはハッシュ化したものをDBに登録する必要があるのでPasswordHasherでハッシュ化する
+                    applicationUser.PasswordHash = UserManager.PasswordHasher.HashPassword(employee.Password);
+                }
+                //StateをModifiedにしてUPDATE文を行うように設定
                 db.Entry(applicationUser).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+
+                //TempDataにフラッシュメッセージを入れておく。TempDataは現在のリクエストと次のリクエストまで存在
+                TempData["flush"] = String.Format("{0}さんの情報を更新しました", applicationUser.EmployeeName);
+
+                return RedirectToAction("Index", "Employees");
             }
-            return View(applicationUser);
+            return View(employee);
         }
 
         // GET: Employees/Delete/5
