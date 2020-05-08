@@ -194,6 +194,15 @@ namespace DailyReportSystem.Controllers
                 Email = applicationUser.Email,
                 EmployeeName = applicationUser.EmployeeName
             };
+
+            //従業員の権限がAdminならAdminに、そうでないならNormalにする。
+            if (UserManager.IsInRole(applicationUser.Id, "Admin"))
+            {
+                employee.AdminFlag = RolesEnum.Admin;
+            }
+            else {
+                employee.AdminFlag = RolesEnum.Normal;
+            }
             return View(employee);
         }
 
@@ -226,6 +235,24 @@ namespace DailyReportSystem.Controllers
                 //StateをModifiedにしてUPDATE文を行うように設定
                 db.Entry(applicationUser).State = EntityState.Modified;
                 db.SaveChanges();
+                //mode.AdminFlagの内容によって処理をSwitchで変える
+                switch (employee.AdminFlag){
+                    case RolesEnum.Admin:
+                        //既に管理者権限を持っているならBreakして抜ける
+                        if (UserManager.IsInRole(applicationUser.Id, "Admin"))
+                            break;
+                        //Adminロールをユーザに対して設定
+                        UserManager.AddToRole(applicationUser.Id,"Admin");
+                        break;
+                       
+                    default:
+                        //管理者以外が選ばれているときに管理者権限を持っていた場合管理者権限を消す
+                        if (UserManager.IsInRole(applicationUser.Id, "Admin")) {
+                            UserManager.RemoveFromRole(applicationUser.Id, "Admin");
+                        }
+                        break;
+                }
+
 
                 //TempDataにフラッシュメッセージを入れておく。TempDataは現在のリクエストと次のリクエストまで存在
                 TempData["flush"] = String.Format("{0}さんの情報を更新しました", applicationUser.EmployeeName);
