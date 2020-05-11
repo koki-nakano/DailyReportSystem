@@ -59,7 +59,10 @@
 
     </dl>
 </div>
+
+@if (Model.isReportCreater) { 
+<p>@Html.ActionLink("この日報を編集する", "Edit", new { id = Model.Id })</p>
+}
 <p>
-    @Html.ActionLink("Edit", "この日報を編集する", new { id = Model.Id }) |
     @Html.ActionLink("一覧へ戻る", "Index")
 </p>

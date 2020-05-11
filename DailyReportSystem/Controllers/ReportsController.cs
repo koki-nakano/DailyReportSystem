@@ -119,7 +119,18 @@ namespace DailyReportSystem.Controllers
             {
                 return HttpNotFound();
             }
-            return View(report);
+            //本人の日報でなければ表示しないように、それをEdit.cshtmlにTempDataで伝える
+            if (report.EmployeeId != User.Identity.GetUserId()) {
+                TempData["wrong_person"] = "true";
+            }
+            ReportEditViewModel editViewModel = new ReportEditViewModel()
+            {
+                Id = report.Id,
+                ReportDate = report.ReportDate,
+                Title = report.Title,
+                Content = report.Content
+            };
+            return View(editViewModel);
         }
 
         // POST: Reports/Edit/5
@@ -127,41 +138,22 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,EmployeeId,ReportDate,Title,Content,CreatedAt,UpdatedAt")] Report report)
+        public ActionResult Edit([Bind(Include = "Id,ReportDate,Title,Content")] ReportEditViewModel editViewModel)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(report).State = EntityState.Modified;
+                Report report = db.Reports.Find(editViewModel.Id);
+                report.ReportDate = editViewModel.ReportDate;
+                report.Title = editViewModel.Title;
+                report.Content = editViewModel.Content;
+                report.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
+
+                //TempDataにフラッシュメッセージを入れておく
+                TempData["flush"] = "日報を編集しました";
                 return RedirectToAction("Index");
             }
-            return View(report);
-        }
-
-        // GET: Reports/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Report report = db.Reports.Find(id);
-            if (report == null)
-            {
-                return HttpNotFound();
-            }
-            return View(report);
-        }
-
-        // POST: Reports/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Report report = db.Reports.Find(id);
-            db.Reports.Remove(report);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            return View(editViewModel);
         }
 
         protected override void Dispose(bool disposing)
