@@ -53,7 +53,18 @@ namespace DailyReportSystem.Controllers
             {
                 return HttpNotFound();
             }
-            return View(report);
+            ReportsDetailsViewModel detailsViewModel = new ReportsDetailsViewModel
+            {
+                Id = report.Id,
+                ReportDate = report.ReportDate,
+                Title = report.Title,
+                Content = report.Content,
+                CreatedAt = report.CreatedAt,
+                UpdatedAt = report.UpdatedAt
+            };
+            detailsViewModel.EmployeeName = db.Users.Find(report.EmployeeId).EmployeeName;
+            detailsViewModel.isReportCreater = User.Identity.GetUserId() == report.EmployeeId;
+            return View(detailsViewModel);
         }
 
         // GET: Reports/Create
