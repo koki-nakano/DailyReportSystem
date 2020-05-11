@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DailyReportSystem.Models;
+using Microsoft.AspNet.Identity;
 
 namespace DailyReportSystem.Controllers
 {
@@ -18,16 +19,17 @@ namespace DailyReportSystem.Controllers
         // GET: Reports
         public ActionResult Index()
         {
-            //日報のリストから表示用のビューモデルのリストを作成
+            // 日報のリストから、表示用のビューモデルのリストを作成
             List<ReportsIndexViewModel> indexViewModels = new List<ReportsIndexViewModel>();
             var reports = db.Reports
                 .OrderByDescending(r => r.ReportDate)
                 .ToList();
-            foreach (Report report in reports) {
+            foreach (Report report in reports)
+            {
                 ReportsIndexViewModel indexViewModel = new ReportsIndexViewModel
                 {
                     Id = report.Id,
-                    //従業員のリストからこの日報のEmployeeIdで検索をかけて取得した従業員の名前を設定
+                    // 従業員のリストからこの日報のEmployeeIdで検索をかけて取得した従業員の名前を設定
                     EmployeeName = db.Users.Find(report.EmployeeId).EmployeeName,
                     ReportDate = report.ReportDate,
                     Title = report.Title,
@@ -35,7 +37,8 @@ namespace DailyReportSystem.Controllers
                 };
                 indexViewModels.Add(indexViewModel);
             }
-            return View(db.Reports.ToList());
+
+            return View(indexViewModels);
         }
 
         // GET: Reports/Details/5
@@ -64,16 +67,33 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,EmployeeId,ReportDate,Title,Content,CreatedAt,UpdatedAt")] Report report)
+        public ActionResult Create([Bind(Include = "ReportDate,Title,Content")] ReportsCreateViewModel createViewModel)
         {
             if (ModelState.IsValid)
             {
+                Report report = new Report()
+                {
+                    ReportDate = createViewModel.ReportDate,
+                    Title = createViewModel.Title,
+                    Content = createViewModel.Content,
+                    //現在ログイン中のUserIDを取得し、EmployeeIdとして登録
+                    EmployeeId = User.Identity.GetUserId(),
+                    //作成時は現在の時刻に設定
+                    CreatedAt = DateTime.Now,
+                    //作成時は現在の時刻に設定
+                    UpdatedAt = DateTime.Now
+                };
+                //Contextに新しいオブジェクト追加
                 db.Reports.Add(report);
+                //実際のDBに反映
                 db.SaveChanges();
+                //TempDataにフラッシュメッセージを入れておく
+                TempData["flush"] = "日報を登録しました";
+                //Indexにリダイレクト
                 return RedirectToAction("Index");
             }
 
-            return View(report);
+            return View(createViewModel);
         }
 
         // GET: Reports/Edit/5
