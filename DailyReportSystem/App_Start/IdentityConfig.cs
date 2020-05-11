@@ -106,10 +106,9 @@ namespace DailyReportSystem
         {
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
-
-        public class ApplicationRole : IdentityRole
-        {
-            // 空で作成
-        }
+    }
+    public class ApplicationRole : IdentityRole
+    {
+        // 空で作成
     }
 }

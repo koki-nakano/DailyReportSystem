@@ -50,6 +50,8 @@ namespace DailyReportSystem.Models
             return new ApplicationDbContext();
         }
 
+        public System.Data.Entity.DbSet<DailyReportSystem.Models.Report> Reports { get; set; }
+
         //public System.Data.Entity.DbSet<DailyReportSystem.Models.ApplicationUser> ApplicationUsers { get; set; }
     }
 }

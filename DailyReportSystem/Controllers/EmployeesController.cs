@@ -82,6 +82,7 @@ namespace DailyReportSystem.Controllers
         }
 
         // GET: Employees/Details/5
+        [Authorize(Roles ="Admin")]
         public ActionResult Details(string id)
         {
             if (id == null)
@@ -144,8 +145,8 @@ namespace DailyReportSystem.Controllers
                 if (result.Succeeded)
                 {
                     // Roleを追加する
-                    var roleManager = new RoleManager<IdentityRole>(
-                        new RoleStore<IdentityRole>(new ApplicationDbContext())
+                    var roleManager = new RoleManager<ApplicationRole>(
+                        new RoleStore<ApplicationRole>(new ApplicationDbContext())
                         );
 
 
@@ -153,7 +154,7 @@ namespace DailyReportSystem.Controllers
                     if (!await roleManager.RoleExistsAsync("Admin"))
                     {
                         // AdminロールをDBに作成
-                        await roleManager.CreateAsync(new IdentityRole() { Name = "Admin" });
+                        await roleManager.CreateAsync(new ApplicationRole() { Name = "Admin" });
                     }
 
                     // mode.AdminFlagの内容によって、処理をswitchで変える。
