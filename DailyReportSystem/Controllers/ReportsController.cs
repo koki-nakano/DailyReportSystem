@@ -32,6 +32,7 @@ namespace DailyReportSystem.Controllers
                     // 従業員のリストからこの日報のEmployeeIdで検索をかけて取得した従業員の名前を設定
                     EmployeeName = db.Users.Find(report.EmployeeId).EmployeeName,
                     ReportDate = report.ReportDate,
+                    CliantCompany = report.CliantCompany,
                     Title = report.Title,
                     Content = report.Content
                 };
@@ -57,7 +58,12 @@ namespace DailyReportSystem.Controllers
             {
                 Id = report.Id,
                 ReportDate = report.ReportDate,
+                WorkTime = report.WorkTime,
+                LeaveTime = report.LeaveTime,
                 Title = report.Title,
+                CliantCompany = report.CliantCompany,
+                CliantPIC = report.CliantPIC,
+                CliantStatus = report.CliantStatus,
                 Content = report.Content,
                 CreatedAt = report.CreatedAt,
                 UpdatedAt = report.UpdatedAt
@@ -78,15 +84,20 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ReportDate,Title,Content")] ReportsCreateViewModel createViewModel)
+        public ActionResult Create([Bind(Include = "ReportDate,WorkTime,LeaveTime,CliantCompany,CliantPIC,CliantStatus,Title,Content")] ReportsCreateViewModel createViewModel)
         {
             if (ModelState.IsValid)
             {
                 Report report = new Report()
                 {
                     ReportDate = createViewModel.ReportDate,
+                    WorkTime = new DateTime(createViewModel.ReportDate.Value.Year, createViewModel.ReportDate.Value.Month, createViewModel.ReportDate.Value.Day, createViewModel.WorkTime.Value.Hour, createViewModel.WorkTime.Value.Minute, createViewModel.WorkTime.Value.Second),
+                    LeaveTime = new DateTime(createViewModel.ReportDate.Value.Year, createViewModel.ReportDate.Value.Month, createViewModel.ReportDate.Value.Day, createViewModel.LeaveTime.Value.Hour, createViewModel.LeaveTime.Value.Minute, createViewModel.LeaveTime.Value.Second),
                     Title = createViewModel.Title,
                     Content = createViewModel.Content,
+                    CliantCompany = createViewModel.CliantCompany,
+                    CliantPIC = createViewModel.CliantPIC,
+                    CliantStatus = createViewModel.CliantStatus,
                     //現在ログイン中のUserIDを取得し、EmployeeIdとして登録
                     EmployeeId = User.Identity.GetUserId(),
                     //作成時は現在の時刻に設定
@@ -94,6 +105,18 @@ namespace DailyReportSystem.Controllers
                     //作成時は現在の時刻に設定
                     UpdatedAt = DateTime.Now
                 };
+                if (createViewModel.CliantCompany == null)
+                {
+                    report.CliantCompany = "--NO ASSIGN--";
+                }
+                if (createViewModel.CliantPIC == null)
+                {
+                    report.CliantPIC = "--NO ASSIGN--";
+                }
+                if (createViewModel.CliantStatus == null)
+                {
+                    report.CliantStatus = "--NO ASSIGN--";
+                }
                 //Contextに新しいオブジェクト追加
                 db.Reports.Add(report);
                 //実際のDBに反映
@@ -127,6 +150,11 @@ namespace DailyReportSystem.Controllers
             {
                 Id = report.Id,
                 ReportDate = report.ReportDate,
+                WorkTime = report.WorkTime,
+                LeaveTime = report.LeaveTime,
+                CliantCompany = report.CliantCompany,
+                CliantPIC = report.CliantPIC,
+                CliantStatus = report.CliantStatus,
                 Title = report.Title,
                 Content = report.Content
             };
@@ -138,15 +166,21 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,ReportDate,Title,Content")] ReportEditViewModel editViewModel)
+        public ActionResult Edit([Bind(Include = "Id,ReportDate,WorkTime,LeaveTime,CliantCompany,CliantPIC,CliantStatus,Title,Content")] ReportEditViewModel editViewModel)
         {
             if (ModelState.IsValid)
             {
                 Report report = db.Reports.Find(editViewModel.Id);
                 report.ReportDate = editViewModel.ReportDate;
+                report.WorkTime = new DateTime(report.ReportDate.Value.Year, report.ReportDate.Value.Month, report.ReportDate.Value.Day, editViewModel.WorkTime.Value.Hour, editViewModel.WorkTime.Value.Minute, editViewModel.WorkTime.Value.Second);
+                report.LeaveTime = new DateTime(report.ReportDate.Value.Year, report.ReportDate.Value.Month, report.ReportDate.Value.Day, editViewModel.LeaveTime.Value.Hour, editViewModel.LeaveTime.Value.Minute, editViewModel.LeaveTime.Value.Second);
                 report.Title = editViewModel.Title;
+                report.CliantCompany = editViewModel.CliantCompany;
+                report.CliantPIC = editViewModel.CliantPIC;
+                report.CliantStatus = editViewModel.CliantStatus;
                 report.Content = editViewModel.Content;
                 report.UpdatedAt = DateTime.Now;
+                db.Entry(report).State = EntityState.Modified;
                 db.SaveChanges();
 
                 //TempDataにフラッシュメッセージを入れておく

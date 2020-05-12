@@ -19,23 +19,54 @@ namespace DailyReportSystem.Models
         [DisplayName("タイトル")]
         public string Title { get; set; }
 
+        [DisplayName("取引先会社名")]
+        public string CliantCompany { get; set; }
         [DisplayName("内容")]
         public string Content { get; set; }
 
     }
-    public class ReportsCreateViewModel { 
+    public class ReportsCreateViewModel {
         [DisplayName("日付")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString ="{0:yyyy-mm-dd}",ApplyFormatInEditMode =true)]
-        [Required(ErrorMessage ="日報の日付を入力してください")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "日報の日付を入力してください")]
         public DateTime? ReportDate { get; set; }
+
+        [DisplayName("出勤時刻")]
+        [DataType(DataType.Time)]
+        [DisplayFormat(DataFormatString = "{0:HH:mm}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "出勤時刻を入力してください")]
+        public DateTime? WorkTime { get; set; }
+
+        [DisplayName("退勤時刻")]
+        [DataType(DataType.Time)]
+        [DisplayFormat(DataFormatString = "{0:HH:mm}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "退勤時刻を入力してください")]
+        public DateTime? LeaveTime { get; set; }
+
+        [DisplayName("取引先会社名")]
+        //[Required(ErrorMessage = "取引先会社名を入力してください")]
+        [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
+        public string CliantCompany { get; set; }
+
+        [DisplayName("取引先担当者")]
+        //[Required(ErrorMessage = "取引先担当者を入力してください")]
+        [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
+        public string CliantPIC { get; set; }
+
+        [DisplayName("取引状況")]
+        [DataType(DataType.MultilineText)]
+        //[Required(ErrorMessage = "取引状況を入力してください")]
+        public string CliantStatus { get; set; }
 
         [DisplayName("タイトル")]
         [Required(ErrorMessage ="タイトルを入力してください")]
         [StringLength(100,ErrorMessage ="{0}は{1}文字を超えることはできません")]
         public string Title { get; set; }
 
+
         [DisplayName("内容")]
+        [DataType(DataType.MultilineText)]
         [Required(ErrorMessage ="内容を入力してください")]
         public string Content { get; set; }
     }
@@ -48,11 +79,24 @@ namespace DailyReportSystem.Models
         [DisplayName("日付")]
         public DateTime? ReportDate { get; set; }
 
+        [DisplayName("出勤時刻")]
+        public DateTime? WorkTime { get; set; }
+        [DisplayName("退勤時刻")]
+        public DateTime? LeaveTime { get; set; }
         [DisplayName("タイトル")]
         public string Title { get; set; }
 
         [DisplayName("内容")]
         public string Content { get; set; }
+
+        [DisplayName("取引先会社名")]
+        public string CliantCompany { get; set; }
+
+        [DisplayName("取引先担当者")]
+        public string CliantPIC { get; set; }
+
+        [DisplayName("取引状況")]
+        public string CliantStatus { get; set; }
 
         [DisplayName("作成日付")]
         public DateTime? CreatedAt { get; set; }
@@ -69,9 +113,36 @@ namespace DailyReportSystem.Models
 
         [DisplayName("日付")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString ="{0:yyyy-mm-dd}",ApplyFormatInEditMode =true)]
+        [DisplayFormat(DataFormatString ="{0:yyyy-MM-dd}",ApplyFormatInEditMode =true)]
         [Required(ErrorMessage ="日報の日付を入力してください")]
         public DateTime? ReportDate { get; set; }
+
+        [DisplayName("出勤時刻")]
+        [DataType(DataType.Time)]
+        [DisplayFormat(DataFormatString = "{0:HH:mm}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "出勤時刻を入力してください")]
+        public DateTime? WorkTime { get; set; }
+
+        [DisplayName("退勤時刻")]
+        [DataType(DataType.Time)]
+        [DisplayFormat(DataFormatString = "{0:HH:mm}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "退勤時刻を入力してください")]
+        public DateTime? LeaveTime { get; set; }
+
+        [DisplayName("取引先会社名")]
+       // [Required(ErrorMessage = "取引先会社名を入力してください")]
+        [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
+        public string CliantCompany { get; set; }
+
+        [DisplayName("取引先担当者")]
+       // [Required(ErrorMessage = "取引先担当者を入力してください")]
+        [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
+        public string CliantPIC { get; set; }
+
+        [DisplayName("取引状況")]
+        [DataType(DataType.MultilineText)]
+      //  [Required(ErrorMessage = "取引状況を入力してください")]
+        public string CliantStatus { get; set; }
 
         [DisplayName("タイトル")]
         [Required(ErrorMessage ="タイトルを入力してください")]
@@ -79,6 +150,7 @@ namespace DailyReportSystem.Models
         public string Title { get; set; }
 
         [DisplayName("内容")]
+        [DataType(DataType.MultilineText)]
         [Required(ErrorMessage ="内容を入力してください")]
         public string Content { get; set; }
 

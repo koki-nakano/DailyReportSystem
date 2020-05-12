@@ -22,7 +22,26 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.ReportDate)
+            @*Html.DisplayFor(model => model.ReportDate)*@
+            @Convert.ToString(string.Format("{0:yyyy/MM/dd}",  Model.ReportDate))
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkTime)
+        </dt>
+
+        <dd>
+            @*Html.DisplayFor(model => model.WorkTime)*@
+            @Convert.ToString(string.Format("{0:HH:mm}", Model.WorkTime))
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LeaveTime)
+        </dt>
+
+        <dd>
+            @*Html.DisplayFor(model => model.LeaveTime)*@
+            @Convert.ToString(string.Format("{0:HH:mm}", Model.LeaveTime))
         </dd>
 
         <dt>
@@ -33,6 +52,27 @@
             @Html.DisplayFor(model => model.Title)
         </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.CliantCompany)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CliantCompany)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CliantPIC)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CliantPIC)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CliantStatus)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CliantStatus)
+        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Content)
         </dt>

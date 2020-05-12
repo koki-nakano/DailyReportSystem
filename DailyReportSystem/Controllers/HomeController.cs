@@ -30,6 +30,7 @@ namespace DailyReportSystem.Controllers
                     Id = report.Id,
                     EmployeeName = db.Users.Find(report.EmployeeId).EmployeeName,
                     ReportDate = report.ReportDate,
+                    CliantCompany = report.CliantCompany,
                     Title = report.Title,
                     Content = report.Content
                 };

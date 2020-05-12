@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<DailyReportSystem.Models.ReportsIndexViewModel>
+
 @{
     ViewBag.Title = "トップ";
 }
@@ -6,7 +7,9 @@
     <h2>日報管理システムへようこそ</h2>
 
     <h4>【自分の日報　一覧】</h4>
-
+    <p>
+        @Html.ActionLink("新規日報の登録", "../Reports/Create")
+    </p>
     <table class=" table table-hover table-striped">
         <tr>
             <th>
@@ -15,6 +18,10 @@
 
             <th>
                 @Html.DisplayNameFor(model => model.ReportDate)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.CliantCompany)
             </th>
 
             <th>
@@ -31,6 +38,10 @@
 
                 <td>
                     @Html.DisplayFor(modelItem => item.ReportDate)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.CliantCompany)
                 </td>
 
                 <td>

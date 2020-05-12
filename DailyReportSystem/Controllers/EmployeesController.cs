@@ -47,11 +47,14 @@ namespace DailyReportSystem.Controllers
             }
         }
 
-        public ApplicationUserManager UserManager {
-            get {
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
                 return _userManager ?? HttpContext.GetOwinContext().Get<ApplicationUserManager>();
             }
-            set {
+            set
+            {
                 _userManager = value;
             }
         }
@@ -65,7 +68,8 @@ namespace DailyReportSystem.Controllers
             //ユーザ一覧を、作成日時が最近のものから順にしてリストとして取得
             List<ApplicationUser> users = db.Users.OrderByDescending(u => u.CreatedAt).ToList();
             //ユーザのリストをEmployeeIndexViewModelのリストに変換
-            foreach (ApplicationUser applicationUser in users) {
+            foreach (ApplicationUser applicationUser in users)
+            {
                 //EmployeeIndexViewModelをApplicationUsersから必要なプロパティだけ抜き出して作成
                 EmployeesIndexViewModel employee = new EmployeesIndexViewModel
                 {
@@ -82,7 +86,7 @@ namespace DailyReportSystem.Controllers
         }
 
         // GET: Employees/Details/5
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(string id)
         {
             if (id == null)
@@ -122,7 +126,7 @@ namespace DailyReportSystem.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult>Create([Bind(Include = "EmployeeName,Email,Password,AdminFlag")] EmployeesCreateViewModel model)
+        public async Task<ActionResult> Create([Bind(Include = "EmployeeName,Email,Password,AdminFlag")] EmployeesCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -149,13 +153,19 @@ namespace DailyReportSystem.Controllers
                         new RoleStore<ApplicationRole>(new ApplicationDbContext())
                         );
 
-
+                    //ERROR-ERROR-ERROR-ERROR
+                    //ERROR-ERROR-ERROR-ERROR
                     // AdminロールがDBに存在しなければ
+                    /*                   
                     if (!await roleManager.RoleExistsAsync("Admin"))
-                    {
-                        // AdminロールをDBに作成
-                        await roleManager.CreateAsync(new ApplicationRole() { Name = "Admin" });
-                    }
+                        {
+                            // AdminロールをDBに作成
+                            await roleManager.CreateAsync(new ApplicationRole() { Name = "Admin" });
+                        }
+                    */
+                    //ERROR-ERROR-ERROR-ERROR
+                    //ERROR-ERROR-ERROR-ERROR
+
 
                     // mode.AdminFlagの内容によって、処理をswitchで変える。
                     switch (model.AdminFlag)
@@ -174,14 +184,16 @@ namespace DailyReportSystem.Controllers
                 AddErrors(result);
             }
             return View(model);
-         }
+        }
         //エラーがある発生した場合エラーメッセージを追加する
-        private void AddErrors(IdentityResult result) {
-            foreach (var error in result.Errors) {
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
                 ModelState.AddModelError("", error);
             }
         }
-     
+
 
         // GET: Employees/Edit/5
         public ActionResult Edit(string id)
@@ -207,7 +219,8 @@ namespace DailyReportSystem.Controllers
             {
                 employee.AdminFlag = RolesEnum.Admin;
             }
-            else {
+            else
+            {
                 employee.AdminFlag = RolesEnum.Normal;
             }
             return View(employee);
@@ -218,8 +231,10 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult>Edit([Bind(Include = "Id,Email,EmployeeName,Password,AdminFlag")]EmployeeEditViewModel employee) {
-            if (ModelState.IsValid) {
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Email,EmployeeName,Password,AdminFlag")]EmployeeEditViewModel employee)
+        {
+            if (ModelState.IsValid)
+            {
                 //DBからidのユーザを取得し検索、そのユーザに対し変更をする
                 ApplicationUser applicationUser = db.Users.Find(employee.Id);
                 //IdentityアカウントのUserNameにはメールアドレスを入れる必要がある
@@ -228,11 +243,13 @@ namespace DailyReportSystem.Controllers
                 applicationUser.EmployeeName = employee.EmployeeName;
                 applicationUser.UpdatedAt = DateTime.Now;
                 //Passwordが空でなければパスワードを変更する
-                if (!String.IsNullOrEmpty(employee.Password)) {
+                if (!String.IsNullOrEmpty(employee.Password))
+                {
                     //Passwordの入力検証
                     var result = await UserManager.PasswordValidator.ValidateAsync(employee.Password);
                     //Passwordの検証に失敗したら、エラーを追加しEditビューをもう一度描画
-                    if (!result.Succeeded) {
+                    if (!result.Succeeded)
+                    {
                         AddErrors(result);
                         return View(employee);
                     }
@@ -243,18 +260,20 @@ namespace DailyReportSystem.Controllers
                 db.Entry(applicationUser).State = EntityState.Modified;
                 db.SaveChanges();
                 //mode.AdminFlagの内容によって処理をSwitchで変える
-                switch (employee.AdminFlag){
+                switch (employee.AdminFlag)
+                {
                     case RolesEnum.Admin:
                         //既に管理者権限を持っているならBreakして抜ける
                         if (UserManager.IsInRole(applicationUser.Id, "Admin"))
                             break;
                         //Adminロールをユーザに対して設定
-                        UserManager.AddToRole(applicationUser.Id,"Admin");
+                        UserManager.AddToRole(applicationUser.Id, "Admin");
                         break;
-                       
+
                     default:
                         //管理者以外が選ばれているときに管理者権限を持っていた場合管理者権限を消す
-                        if (UserManager.IsInRole(applicationUser.Id, "Admin")) {
+                        if (UserManager.IsInRole(applicationUser.Id, "Admin"))
+                        {
                             UserManager.RemoveFromRole(applicationUser.Id, "Admin");
                         }
                         break;
