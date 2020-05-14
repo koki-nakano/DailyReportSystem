@@ -169,6 +169,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\EmployeesController.cs" />
+    <Compile Include="Controllers\FollowsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Global.asax.cs">
@@ -202,9 +203,15 @@
     <Compile Include="Migrations\202005110707526_AddReportsToDbContext3.Designer.cs">
       <DependentUpon>202005110707526_AddReportsToDbContext3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202005130142283_AddFollowsToDbContext.cs" />
+    <Compile Include="Migrations\202005130142283_AddFollowsToDbContext.Designer.cs">
+      <DependentUpon>202005130142283_AddFollowsToDbContext.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\EmployeeViewModels.cs" />
+    <Compile Include="Models\Follow.cs" />
+    <Compile Include="Models\FollowsViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Report.cs" />
     <Compile Include="Models\ReportsViewModel.cs" />
@@ -265,6 +272,11 @@
     <Content Include="Views\Reports\Details.cshtml" />
     <Content Include="Views\Reports\Edit.cshtml" />
     <Content Include="Views\Reports\Index.cshtml" />
+    <Content Include="Views\Follows\Create.cshtml" />
+    <Content Include="Views\Follows\Delete.cshtml" />
+    <Content Include="Views\Follows\Details.cshtml" />
+    <Content Include="Views\Follows\Edit.cshtml" />
+    <Content Include="Views\Follows\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -303,6 +315,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202005110707526_AddReportsToDbContext3.resx">
       <DependentUpon>202005110707526_AddReportsToDbContext3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005130142283_AddFollowsToDbContext.resx">
+      <DependentUpon>202005130142283_AddFollowsToDbContext.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

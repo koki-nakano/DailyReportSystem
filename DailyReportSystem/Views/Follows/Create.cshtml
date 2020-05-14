@@ -1,0 +1,46 @@
+﻿@model IEnumerable<DailyReportSystem.Models.FollowsCreateViewModel>
+
+@{
+    ViewBag.Title = "フォロー登録";
+}
+
+<h2>ユーザ一覧　登録</h2>
+
+<table class="table table-hover table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.EmployeeName)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            
+            <tr>
+                <td>
+                    @Html.HiddenFor(modelItem => item.FollowId)
+                    @Html.DisplayFor(modelItem => item.EmployeeName)
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                             <input type="submit" value="フォロー" class="btn btn-default " />
+                         </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    }
+</table>
+
+    <div>
+        @Html.ActionLink("フォロー一覧に戻る", "Index")
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }

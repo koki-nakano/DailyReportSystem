@@ -12,6 +12,8 @@ namespace DailyReportSystem.Models
     {
         [DisplayName("ID")]
         public int Id { get; set; }
+        [DisplayName("社員ID")]
+        public string EmployeeId { get; set; }
         [DisplayName("氏名")]
         public string EmployeeName { get; set; }
         [DisplayName("日付")]

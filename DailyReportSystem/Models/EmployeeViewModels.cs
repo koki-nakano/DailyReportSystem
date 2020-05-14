@@ -21,6 +21,8 @@ namespace DailyReportSystem.Models
         [DisplayName("氏名")]
         public string EmployeeName { get; set; }
         public int DeleteFlg { get; set; }//user delete flug
+
+
     }
 
     public enum RolesEnum {

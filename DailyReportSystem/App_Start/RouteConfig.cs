@@ -16,7 +16,8 @@ namespace DailyReportSystem
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                //フォロー機能作成中Home->Follow
+                defaults: new { controller = "Follows", action = "Index", id = UrlParameter.Optional }
             );
         }
     }
