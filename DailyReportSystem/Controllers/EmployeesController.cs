@@ -13,9 +13,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity.EntityFramework;
 using DailyReportSystem.Migrations;
+using System.Web.Security;
 
 namespace DailyReportSystem.Controllers
 {
+    //管理者以外のアクセスを制限
     [Authorize(Roles = "Admin")]
     public class EmployeesController : Controller
     {
@@ -86,6 +88,7 @@ namespace DailyReportSystem.Controllers
         }
 
         // GET: Employees/Details/5
+        //詳細も管理者権限でアクセス制御
         [Authorize(Roles = "Admin")]
         public ActionResult Details(string id)
         {
@@ -93,11 +96,15 @@ namespace DailyReportSystem.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            //Usersデータベースに指定したIDのユーザ情報をapplicationUserに保存
             ApplicationUser applicationUser = db.Users.Find(id);
+            //いなかった場合
             if (applicationUser == null)
             {
                 return HttpNotFound();
             }
+
+            //社員情報をemployeeに格納
             EmployeeDetailsViewModel employee = new EmployeeDetailsViewModel
             {
                 Id = applicationUser.Id,
@@ -106,10 +113,25 @@ namespace DailyReportSystem.Controllers
                 CreatedAt = applicationUser.CreatedAt,
                 UpdatedAt = applicationUser.UpdatedAt
             };
+            //Roleを確認し、設定する
+            if (UserManager.IsInRole(applicationUser.Id, "Admin"))
+            {
+                employee.Role = "管理者";
+            }
+            else if (UserManager.IsInRole(applicationUser.Id, "Manager"))
+            {
+                employee.Role = "部長";
+            }
+            else if (UserManager.IsInRole(applicationUser.Id,"Chief"))
+            {
+                employee.Role = "課長";
+            }
+            else
+            {
+                employee.Role = "一般";
+            }
 
-            //RoleがAdminかどうか確認し、そうなら管理者、違うなら一般にする
-            employee.Role = UserManager.IsInRole(applicationUser.Id, "Admin") ?
-                "管理者" : "一般";
+            //社員情報を描画
             return View(employee);
         }
 
@@ -144,7 +166,6 @@ namespace DailyReportSystem.Controllers
 
                 //ユーザ情報をDBに登録
                 var result = await UserManager.CreateAsync(applicationUser, model.Password);
-                //DB登録に成功した場合
                 // DB登録に成功した場合
                 if (result.Succeeded)
                 {
@@ -153,19 +174,24 @@ namespace DailyReportSystem.Controllers
                         new RoleStore<ApplicationRole>(new ApplicationDbContext())
                         );
 
-                    //ERROR-ERROR-ERROR-ERROR
-                    //ERROR-ERROR-ERROR-ERROR
-                    // AdminロールがDBに存在しなければ
-                    /*                   
+                    //AdminロールがDBに存在しなければ
                     if (!await roleManager.RoleExistsAsync("Admin"))
-                        {
-                            // AdminロールをDBに作成
-                            await roleManager.CreateAsync(new ApplicationRole() { Name = "Admin" });
-                        }
-                    */
-                    //ERROR-ERROR-ERROR-ERROR
-                    //ERROR-ERROR-ERROR-ERROR
-
+                    {
+                        // AdminロールをDBに作成
+                        await roleManager.CreateAsync(new ApplicationRole() { Name = "Admin" });
+                    }
+                    //Managerロールが存在しなければ
+                    if (!await roleManager.RoleExistsAsync("Manager"))
+                    {
+                        // ManagerロールをDBに作成
+                        await roleManager.CreateAsync(new ApplicationRole() { Name = "Manager" });
+                    }
+                    //Chiefロールが存在しなければ
+                    if (!await roleManager.RoleExistsAsync("Chief"))
+                    {
+                        // ChiefロールをDBに作成
+                        await roleManager.CreateAsync(new ApplicationRole() { Name = "Chief" });
+                    }
 
                     // mode.AdminFlagの内容によって、処理をswitchで変える。
                     switch (model.AdminFlag)
@@ -173,6 +199,14 @@ namespace DailyReportSystem.Controllers
                         case RolesEnum.Admin:
                             // Adminロールをユーザーに対して設定
                             await UserManager.AddToRoleAsync(applicationUser.Id, "Admin");
+                            break;
+                        case RolesEnum.Manager:
+                            // Adminロールをユーザーに対して設定
+                            await UserManager.AddToRoleAsync(applicationUser.Id, "Manager");
+                            break;
+                        case RolesEnum.Chief:
+                            // Adminロールをユーザーに対して設定
+                            await UserManager.AddToRoleAsync(applicationUser.Id, "Chief");
                             break;
                     }
 
@@ -219,7 +253,15 @@ namespace DailyReportSystem.Controllers
             {
                 employee.AdminFlag = RolesEnum.Admin;
             }
-            else
+            else if (UserManager.IsInRole(applicationUser.Id, "Manager"))
+            {
+                employee.AdminFlag = RolesEnum.Manager;
+            }
+            else if (UserManager.IsInRole(applicationUser.Id, "Chief"))
+            {
+                employee.AdminFlag = RolesEnum.Chief;
+            }
+            else 
             {
                 employee.AdminFlag = RolesEnum.Normal;
             }
@@ -270,6 +312,20 @@ namespace DailyReportSystem.Controllers
                         UserManager.AddToRole(applicationUser.Id, "Admin");
                         break;
 
+                    case RolesEnum.Manager:
+                        //既に部長ならブレイク
+                        if (UserManager.IsInRole(applicationUser.Id, "Manager"))
+                            break;
+                        UserManager.AddToRole(applicationUser.Id, "Manager");
+                        break;
+
+                    case RolesEnum.Chief:
+                        //既に部長ならブレイク
+                        if (UserManager.IsInRole(applicationUser.Id, "Chief"))
+                            break;
+                        UserManager.AddToRole(applicationUser.Id, "Chief");
+                        break;
+
                     default:
                         //管理者以外が選ばれているときに管理者権限を持っていた場合管理者権限を消す
                         if (UserManager.IsInRole(applicationUser.Id, "Admin"))
@@ -309,9 +365,22 @@ namespace DailyReportSystem.Controllers
                 CreatedAt = applicationUser.CreatedAt,
                 UpdatedAt = applicationUser.UpdatedAt
             };
-            //RoleがAdminかどうか確認し、そうなら管理者、違うなら一般にする
-            employee.Role = UserManager.IsInRole(applicationUser.Id, "Admin") ?
-                "管理者" : "一般";
+            //Roleを確認し、設定する
+            if (employee.Role == "Admin")
+            {
+                employee.Role = "管理者";
+            }
+            else if (employee.Role == "Manager")
+            {
+                employee.Role = "部長";
+            }
+            else if (employee.Role == "Chief") {
+                employee.Role = "課長";
+            }
+            else 
+            {
+                employee.Role = "一般";
+            }
             return View(employee);
         }
 

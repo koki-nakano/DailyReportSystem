@@ -27,30 +27,72 @@
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
-            <th></th>  
+            <th></th>
+
         </tr>
-        @foreach (var item in Model)
+        @for (var i = 0; i < Model.Count(); i++)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmployeeName)
-                </td>
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => modelItem.ElementAt(i).EmployeeName)
+        </td>
 
-                <td>
-                    @Html.DisplayFor(modelItem => item.ReportDate)
-                </td>
+        <td>
+            @Convert.ToString(string.Format("{0:yyyy/MM/dd}", (Model.ElementAt(i).ReportDate)))
+        </td>
 
-                <td>
-                    @Html.DisplayFor(modelItem => item.CliantCompany)
-                </td>
+        <td>
+            @Html.DisplayFor(modelItem => modelItem.ElementAt(i).CliantCompany)
+        </td>
 
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
+        <td>
+            @Html.DisplayFor(modelItem => modelItem.ElementAt(i).Title)
+        </td>
 
-                <td>
-                    @Html.ActionLink("詳細を表示", "Details", "Reports", new { id = item.Id },null)
-                </td>
-            </tr>
+        <td>
+            @Html.ActionLink("詳細を見る", "Details", "Reports", new { id = Model.ElementAt(i).Id }, null)
+        </td>
+
+        @*if(Model.ElementAt(i).LikeFlg ==DailyReportSystem.Models.LikeStatus.UnLike)
+        {
+            <td>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        @using (Html.BeginForm("Create", "Likes"))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(modelItem => modelItem.ElementAt(i).Id)
+                            <input type="submit" value="いいね" class="btn" style="background :#4dbaaa;color:white" />
+                        }
+                    </div>
+                </div>
+            </td>
+        }
+        else
+        {
+            <td>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        @using (Html.BeginForm("Delete", "Likes"))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(modelItem => modelItem.ElementAt(i).Id)
+                            <input type="submit" value="いいね解除" class="btn" style="background :#7f4c3a; color:white" />
+                        }
+                    </div>
+                </div>
+            </td>
+        }
+
+        @if (Model.ElementAt(i).Accepting == 0)
+        {
+            <td style="color:red">否認</td>
+        }
+        else
+        {
+            <td style="color:blue">承認</td>
+        }
+        *@
+    </tr>
         }
     </table>

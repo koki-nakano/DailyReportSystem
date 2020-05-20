@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Web;
 
 namespace DailyReportSystem.Models
 {
-    public class Follow
+    public class Likes
     {
         [Key]
+        [DisplayName("ID")]
         public int Id { get; set; }
 
-        public string EmployeeId { get; set; }
+        [DisplayName("ReportId")]
+        public int ReportId { get; set; }
 
-        public string FollowId { get; set; }
-
+        [DisplayName("EmployeeId")]
+        public string  EmployeeId { get; set; }
     }
 }

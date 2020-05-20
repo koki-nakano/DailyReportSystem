@@ -8,6 +8,13 @@ using System.Security.Policy;
 
 namespace DailyReportSystem.Models
 {
+    public enum AcceptStatus
+    {
+        [Display(Name = "否認")]
+        UnAuthorize = 0,
+        [Display(Name = "承認")]
+        Auhorized = 1
+    }
     public class ReportsIndexViewModel
     {
         [DisplayName("ID")]
@@ -26,8 +33,21 @@ namespace DailyReportSystem.Models
         [DisplayName("内容")]
         public string Content { get; set; }
 
+        public LikeStatus? LikeFlg { get; set; }
+
+        public RolesEnum? AdminFlag { get; set; }
+
+        [DisplayName("承認状況")]
+        public int Accepting { get; set; }
+
+        public AcceptStatus? AcceptFlg { get; set; }
+
+        [DisplayName("ログインユーザID")]
+        public string LoginUserId { get; set; }
+
     }
-    public class ReportsCreateViewModel {
+    public class ReportsCreateViewModel
+    {
         [DisplayName("日付")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -62,18 +82,27 @@ namespace DailyReportSystem.Models
         public string CliantStatus { get; set; }
 
         [DisplayName("タイトル")]
-        [Required(ErrorMessage ="タイトルを入力してください")]
-        [StringLength(100,ErrorMessage ="{0}は{1}文字を超えることはできません")]
+        [Required(ErrorMessage = "タイトルを入力してください")]
+        [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
         public string Title { get; set; }
 
 
         [DisplayName("内容")]
         [DataType(DataType.MultilineText)]
-        [Required(ErrorMessage ="内容を入力してください")]
+        [Required(ErrorMessage = "内容を入力してください")]
         public string Content { get; set; }
+
+        [DisplayName("コメント")]
+        public string Comment { get; set; }
+        [DisplayName("承認状況")]
+        public int Accepting { get; set; }
+
+        public LikeStatus? LikeFlg { get; set; }
+
     }
 
-    public class ReportsDetailsViewModel { 
+    public class ReportsDetailsViewModel
+    {
         [DisplayName("ID")]
         public int Id { get; set; }
         [DisplayName("氏名")]
@@ -107,16 +136,30 @@ namespace DailyReportSystem.Models
 
         //このレポートを作成したいとなら「この日報を編集する」リンクを出すためのフラグ作成
         public bool isReportCreater { get; set; }
+
+        public LikeStatus? LikeFlg { get; set; }
+
+        [DisplayName("コメント")]
+        public string Comment{ get; set; }
+        [DisplayName("承認状況")]
+        public int Accepting { get; set; }
+        //test
+        [DisplayName("承認権限")]
+        public AcceptStatus? AcceptFlg { get; set; }
+
+        [DisplayName("ログインユーザID")]
+        public string LoginUserId { get; set; }
     }
 
-    public class ReportEditViewModel { 
+    public class ReportEditViewModel
+    {
         [DisplayName("ID")]
         public int Id { get; set; }
 
         [DisplayName("日付")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString ="{0:yyyy-MM-dd}",ApplyFormatInEditMode =true)]
-        [Required(ErrorMessage ="日報の日付を入力してください")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "日報の日付を入力してください")]
         public DateTime? ReportDate { get; set; }
 
         [DisplayName("出勤時刻")]
@@ -132,30 +175,39 @@ namespace DailyReportSystem.Models
         public DateTime? LeaveTime { get; set; }
 
         [DisplayName("取引先会社名")]
-       // [Required(ErrorMessage = "取引先会社名を入力してください")]
+        // [Required(ErrorMessage = "取引先会社名を入力してください")]
         [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
         public string CliantCompany { get; set; }
 
         [DisplayName("取引先担当者")]
-       // [Required(ErrorMessage = "取引先担当者を入力してください")]
+        // [Required(ErrorMessage = "取引先担当者を入力してください")]
         [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
         public string CliantPIC { get; set; }
 
         [DisplayName("取引状況")]
         [DataType(DataType.MultilineText)]
-      //  [Required(ErrorMessage = "取引状況を入力してください")]
+        //  [Required(ErrorMessage = "取引状況を入力してください")]
         public string CliantStatus { get; set; }
 
         [DisplayName("タイトル")]
-        [Required(ErrorMessage ="タイトルを入力してください")]
-        [StringLength(100,ErrorMessage ="{0}は{1}文字を超えることはできません")]
+        [Required(ErrorMessage = "タイトルを入力してください")]
+        [StringLength(100, ErrorMessage = "{0}は{1}文字を超えることはできません")]
         public string Title { get; set; }
 
         [DisplayName("内容")]
         [DataType(DataType.MultilineText)]
-        [Required(ErrorMessage ="内容を入力してください")]
+        [Required(ErrorMessage = "内容を入力してください")]
         public string Content { get; set; }
 
+        public int Accepting { get; set; }
+    }
 
+    public class ReportsAcceptViewModel
+    {
+        public int Id { get; set; }
+
+        public string Comment  { get; set; }
+
+        public string Accepting { get; set; }
     }
 }

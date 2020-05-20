@@ -8,6 +8,11 @@ using System.Security.Policy;
 
 namespace DailyReportSystem.Models
 {
+    public enum FollowStatus { 
+        UnFollow = 0,
+        Followed = 1,
+        MyUser =2
+    }
     public class FollowsIndexViewModel
     {
         [DisplayName("ID")]
@@ -27,6 +32,8 @@ namespace DailyReportSystem.Models
         public string Content { get; set; }
         [DisplayName("フォローID")]
         public string FollowId { get; set; }
+
+
     }
 
     public class FollowsCreateViewModel
@@ -42,5 +49,23 @@ namespace DailyReportSystem.Models
 
         [DisplayName("フォローID")]
         public string FollowId { get; set; }
+
+        public FollowStatus? FollowFlg { get; set; }
+    }
+    public class FollowsDeleteViewModel
+    {
+        [DisplayName("ID")]
+        public int Id { get; set; }
+
+        [DisplayName("社員ID")]
+        public string EmployeeId { get; set; }
+
+        [DisplayName("氏名")]
+        public string EmployeeName { get; set; }
+
+        [DisplayName("フォローID")]
+        public string FollowId { get; set; }
+
+        public FollowStatus? FollowFlg { get; set; }
     }
 }

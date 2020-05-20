@@ -4,7 +4,7 @@
     ViewBag.Title = "日報一覧";
 }
 
-    <h2>日報一覧</h2>
+<h2>日報一覧</h2>
 
 <p>
     @Html.ActionLink("新規日報の登録", "Create")
@@ -26,26 +26,66 @@
             @Html.DisplayNameFor(model => model.Title)
         </th>
         <th></th>
+        <th></th>
+        <th></th>
     </tr>
-@foreach (var item in Model) {
+    @for (var i = 0; i < Model.Count(); i++)
+    {
 <tr>
     <td>
-        @Html.DisplayFor(modelItem => item.EmployeeName)
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).EmployeeName)
     </td>
     <td>
-        @Convert.ToString(string.Format("{0:yyyy/MM/dd}", item.ReportDate))
+        @Convert.ToString(string.Format("{0:yyyy/MM/dd}", (Model.ElementAt(i).ReportDate)))
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).CliantCompany)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).Title)
+    </td>
+    <td>
+        @Html.ActionLink("詳細を見る", "Details", "Reports", new { id = Model.ElementAt(i).Id }, null)
+    </td>
 
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.CliantCompany)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Title)
-    </td>
+    @if (Model.ElementAt(i).LikeFlg == DailyReportSystem.Models.LikeStatus.UnLike)
+    {
+        <td>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @using (Html.BeginForm("Create", "Likes"))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(modelItem => modelItem.ElementAt(i).Id)
+                        <input type="submit" value="いいね" class="btn" style="background :#4dbaaa;color:white" />
+                    }
+                </div>
+            </div>
+        </td>
+    }
+    else
+    {
+        <td>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @using (Html.BeginForm("Delete", "Likes"))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(modelItem => modelItem.ElementAt(i).Id)
+                        <input type="submit" value="いいね解除" class="btn" style="background :#7f4c3a; color:white" />
+                    }
+                </div>
+            </div>
+        </td>
+    }
+    @if (Model.ElementAt(i).AcceptFlg == DailyReportSystem.Models.AcceptStatus.UnAuthorize)
+    {
+        <td style="color:red">否認</td>
+    }
+    else { 
+        <td style="color:blue">承認</td>
+    }
 
-    <td>
-        @Html.ActionLink("詳細を表示", "Details", new { id = item.Id })
-    </td>
 </tr>
-}
+    }
 </table>

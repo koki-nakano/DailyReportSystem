@@ -1,4 +1,4 @@
-﻿@model DailyReportSystem.Models.Follow
+﻿@model DailyReportSystem.Models.Likes
 
 @{
     ViewBag.Title = "Details";
@@ -7,23 +7,23 @@
 <h2>Details</h2>
 
 <div>
-    <h4>Follow</h4>
+    <h4>Likes</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ReportId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReportId)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.EmployeeId)
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.EmployeeId)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.FollowId)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.FollowId)
         </dd>
 
     </dl>

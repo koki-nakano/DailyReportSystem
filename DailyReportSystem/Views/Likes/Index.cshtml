@@ -1,0 +1,64 @@
+﻿@model IEnumerable<DailyReportSystem.Models.LikesIndexViewModel>
+
+@{
+    ViewBag.Title = "いいね日報一覧";
+}
+
+<h2>いいね日報　一覧</h2>
+
+<p>
+    @Html.ActionLink("日報一覧", "../Reports/Index")
+</p>
+<table class="table table-hover table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.EmployeeName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ReportDate)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.CliantCompany)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    @for (var i = 0; i < Model.Count(); i++)
+    {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).EmployeeName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).ReportDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).CliantCompany)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => modelItem.ElementAt(i).Title)
+    </td>
+    <td>
+        @Html.ActionLink("詳細を見る", "Details", "Reports", new { id = Model.ElementAt(i).Id }, null)
+    </td>
+    <td>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @using (Html.BeginForm("Delete","Likes"))
+                {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(modelItem => modelItem.ElementAt(i).Id)
+                        <input type="submit" value="いいね解除" class="btn"  style="background :#7f4c3a;color:white" />
+                }
+            </div>
+        </div>
+    </td>
+</tr>
+    }
+</table>

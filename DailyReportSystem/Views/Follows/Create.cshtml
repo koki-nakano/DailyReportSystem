@@ -14,33 +14,37 @@
         <th></th>
     </tr>
 
-    @foreach (var item in Model)
+    @for (var i = 0; i < Model.Count(); i++)
     {
-        using (Html.BeginForm())
-        {
-            @Html.AntiForgeryToken()
-            
             <tr>
                 <td>
-                    @Html.HiddenFor(modelItem => item.FollowId)
-                    @Html.DisplayFor(modelItem => item.EmployeeName)
+                    @Html.DisplayFor(modelItem => modelItem.ElementAt(i).EmployeeName)
                 </td>
                 <td>
                     <div class="form-group">
                         <div class="col-md-offset-2 col-md-10">
-                             <input type="submit" value="フォロー" class="btn btn-default " />
-                         </div>
+                            @using (Html.BeginForm())
+                                {
+                                    if (Model.ElementAt(i).FollowFlg == DailyReportSystem.Models.FollowStatus.UnFollow)
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.HiddenFor(modelItem => modelItem.ElementAt(i).EmployeeName)
+                                    @Html.HiddenFor(modelItem => modelItem.ElementAt(i).FollowId)
+                                    <input type="submit" value="フォロー" class="btn" style="background :#4dbaaa;color:white" />
+                                }
+
+                            }
+                        </div>
                     </div>
                 </td>
             </tr>
-        }
     }
 </table>
 
-    <div>
-        @Html.ActionLink("フォロー一覧に戻る", "Index")
-    </div>
+<div>
+    @Html.ActionLink("フォロー一覧に戻る", "Index")
+</div>
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
-    }
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

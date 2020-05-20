@@ -23,7 +23,7 @@
 
         <dd>
             @*Html.DisplayFor(model => model.ReportDate)*@
-            @Convert.ToString(string.Format("{0:yyyy/MM/dd}",  Model.ReportDate))
+            @Convert.ToString(string.Format("{0:yyyy/MM/dd}", Model.ReportDate))
         </dd>
 
         <dt>
@@ -97,7 +97,78 @@
             @Html.DisplayFor(model => model.UpdatedAt)
         </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.Accepting)
+        </dt>
+
+        @if (Model.AcceptFlg == DailyReportSystem.Models.AcceptStatus.UnAuthorize)
+        {
+            <dd style="color:red">否認</dd>
+        }
+        else
+        {
+            <dd style="color:blue">承認</dd>
+        }
+
+
+
+
+        @if (Model.LikeFlg == DailyReportSystem.Models.LikeStatus.UnLike)
+        {
+            <dd style="margin:1% 0 0 13%">
+
+                @using (Html.BeginForm("Create", "Likes"))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    <input type="submit" value="いいね" class="btn" style="background :#4dbaaa;color:white" />
+                }
+            </dd>
+        }
+        else
+        {
+            <dd style="margin:1% 0 0 15%">
+
+                @using (Html.BeginForm("Delete", "Likes"))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    <input type="submit" value="いいね解除" class="btn" style="background:#7f4c3a;color:white" />
+                }
+            </dd>
+        }
     </dl>
+    <hr>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+
+        @using (Html.BeginForm("Accept", "Reports"))
+        {
+            if (Model.AcceptFlg == DailyReportSystem.Models.AcceptStatus.UnAuthorize)
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.Id)
+                <textarea rows="4" cols="25" style="margin:1% 0 0 9%" name="Comment"></textarea>
+                <br>
+                <input type="submit" name="Accepting" value="否認" class="btn" style="background:#d92546;color:white;margin:1% 0 0 10%" />
+                <input type="submit" name="Accepting" value="承認" class="btn" style="background:#276cf5;color:white;margin:1% 0 0 5%" />
+            }
+            else
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.Id)
+                <textarea rows="4" cols="25" style="margin:1% 0 0 9%" name="comment"></textarea>
+                <br>
+                <input type="submit" value="否認" class="btn" style="background:#d92546;color:white;margin:1% 0 0 15%" />
+            }
+        }
+
 </div>
 
 @if (Model.isReportCreater) { 

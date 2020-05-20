@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DailyReportSystem.Models;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 
 namespace DailyReportSystem.Controllers
@@ -19,12 +20,23 @@ namespace DailyReportSystem.Controllers
         // GET: Reports
         public ActionResult Index()
         {
+            var MyId = User.Identity.GetUserId();
             // 日報のリストから、表示用のビューモデルのリストを作成
             List<ReportsIndexViewModel> indexViewModels = new List<ReportsIndexViewModel>();
+
+            //ReportsDBを更新日時が降順でreportsリストに格納
             var reports = db.Reports
                 .OrderByDescending(r => r.UpdatedAt)
                 //.OrderByDescending(r => r.ReportDate)
                 .ToList();
+
+            //LikesDBからいいねしている日報を抽出
+            var likes = db.Likes
+                .Where(l => l.EmployeeId ==MyId)
+                .Select(l => l.ReportId)
+                .ToList();
+
+            //1件ずつあるだけ回す
             foreach (Report report in reports)
             {
                 ReportsIndexViewModel indexViewModel = new ReportsIndexViewModel
@@ -37,21 +49,49 @@ namespace DailyReportSystem.Controllers
                     ReportDate = report.ReportDate,
                     CliantCompany = report.CliantCompany,
                     Title = report.Title,
-                    Content = report.Content
+                    Content = report.Content,
                 };
+                //いいねしていた場合
+                if (likes.Contains(report.Id))
+                {
+                    //済みフラグ
+                    indexViewModel.LikeFlg = LikeStatus.Like;
+                }
+                else {
+                    //まだフラグ
+                    indexViewModel.LikeFlg = LikeStatus.UnLike;
+                }
+                //承認フラグ判定
+                if (report.Accepting == 0)
+                {
+                    indexViewModel.AcceptFlg = AcceptStatus.UnAuthorize;
+                }
+                else {
+                    indexViewModel.AcceptFlg = AcceptStatus.Auhorized;
+                }
+                
+                //ModelをModelsに追加
                 indexViewModels.Add(indexViewModel);
             }
-
+            //Modelsをリターン
             return View(indexViewModels);
         }
 
         // GET: Reports/Details/5
         public ActionResult Details(int? id)
         {
+            var MyId = User.Identity.GetUserId();
+            //いいねしているリストを作成
+            var likes = db.Likes
+                .Where(l => l.EmployeeId == MyId)
+                .Select(l => l.ReportId)
+                .ToList();
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            //BindしたIDをReportsDBと照合
             Report report = db.Reports.Find(id);
             if (report == null)
             {
@@ -69,8 +109,26 @@ namespace DailyReportSystem.Controllers
                 CliantStatus = report.CliantStatus,
                 Content = report.Content,
                 CreatedAt = report.CreatedAt,
-                UpdatedAt = report.UpdatedAt
+                UpdatedAt = report.UpdatedAt,
+                Comment = report.Comment
             };
+            //いいねしてた判定
+            if (likes.Contains(report.Id))
+            {
+                detailsViewModel.LikeFlg = LikeStatus.Like;
+            }
+            else {
+                detailsViewModel.LikeFlg = LikeStatus.UnLike;
+            }
+            //承認フラグ判定
+            if (report.Accepting == 0)
+            {
+                detailsViewModel.AcceptFlg = AcceptStatus.UnAuthorize;
+            }
+            else
+            {
+                detailsViewModel.AcceptFlg = AcceptStatus.Auhorized;
+            }
             detailsViewModel.EmployeeName = db.Users.Find(report.EmployeeId).EmployeeName;
             detailsViewModel.isReportCreater = User.Identity.GetUserId() == report.EmployeeId;
             return View(detailsViewModel);
@@ -87,7 +145,7 @@ namespace DailyReportSystem.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ReportDate,WorkTime,LeaveTime,CliantCompany,CliantPIC,CliantStatus,Title,Content")] ReportsCreateViewModel createViewModel)
+        public ActionResult Create([Bind(Include = "ReportDate,WorkTime,LeaveTime,CliantCompany,CliantPIC,CliantStatus,Title,Content,Comment,Accepting")] ReportsCreateViewModel createViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -106,7 +164,9 @@ namespace DailyReportSystem.Controllers
                     //作成時は現在の時刻に設定
                     CreatedAt = DateTime.Now,
                     //作成時は現在の時刻に設定
-                    UpdatedAt = DateTime.Now
+                    UpdatedAt = DateTime.Now,
+                    Comment = createViewModel.Comment,
+                    Accepting = createViewModel.Accepting
                 };
                 if (createViewModel.CliantCompany == null)
                 {
@@ -120,6 +180,7 @@ namespace DailyReportSystem.Controllers
                 {
                     report.CliantStatus = "--NO ASSIGN--";
                 }
+
                 //Contextに新しいオブジェクト追加
                 db.Reports.Add(report);
                 //実際のDBに反映
@@ -132,7 +193,7 @@ namespace DailyReportSystem.Controllers
 
             return View(createViewModel);
         }
-
+  
         // GET: Reports/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -191,6 +252,36 @@ namespace DailyReportSystem.Controllers
                 return RedirectToAction("Index");
             }
             return View(editViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Accept([Bind(Include = "Id,Comment,Accepting")] ReportsAcceptViewModel acceptViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                Report report = db.Reports.Find(acceptViewModel.Id);
+                report.Id = acceptViewModel.Id;
+                report.Comment = acceptViewModel.Comment;
+                if (acceptViewModel.Accepting == "承認")
+                {
+                    report.Accepting = 1;
+                    //TempDataにフラッシュメッセージを入れておく
+                    TempData["flush"] = "承認しました";
+                }
+                else 
+                {
+                    report.Accepting = 0;
+                    //TempDataにフラッシュメッセージを入れておく
+                    TempData["flush"] = "否認しました";
+                }
+                db.Entry(report).State = EntityState.Modified;
+                db.SaveChanges();
+
+
+                return RedirectToAction("Index");
+            }
+            return View(acceptViewModel);
         }
 
         protected override void Dispose(bool disposing)

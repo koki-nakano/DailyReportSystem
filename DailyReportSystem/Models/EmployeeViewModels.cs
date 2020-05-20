@@ -29,7 +29,11 @@ namespace DailyReportSystem.Models
         [Display(Name = "一般")]
         Normal = 1,
         [Display(Name = "管理者")]
-        Admin = 2
+        Admin = 2,
+        [Display(Name="部長")]
+        Manager = 3,
+        [Display(Name ="課長")]
+        Chief = 4
     }
 
     public class EmployeesCreateViewModel {
@@ -93,6 +97,8 @@ namespace DailyReportSystem.Models
 
         [DisplayName("権限")]
         public  string  Role { get; set; }
+
+        public RolesEnum? AdminFlag { get; set; }
     }
 
     public class EmployeeDeleteViewModel {

@@ -1,40 +1,52 @@
-﻿@model DailyReportSystem.Models.Follow
+﻿@model IEnumerable<DailyReportSystem.Models.FollowsDeleteViewModel>
 
 @{
-    ViewBag.Title = "Delete";
+    ViewBag.Title = "フォロー解除";
 }
 
-<h2>Delete</h2>
+<h2>ユーザ一覧　解除</h2>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Follow</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.EmployeeId)
-        </dt>
+<table class="table table-hover table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.EmployeeName)
+        </th>
+        <th></th>
+    </tr>
 
-        <dd>
-            @Html.DisplayFor(model => model.EmployeeId)
-        </dd>
+    @for (var i = 0; i < Model.Count(); i++)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => modelItem.ElementAt(i).EmployeeName)
+            </td>
+            <td>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.FollowId)
-        </dt>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        @using (Html.BeginForm("Delete","Follows"))
+                        {
+                            if (Model.ElementAt(i).FollowFlg == DailyReportSystem.Models.FollowStatus.Followed)
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.HiddenFor(modelItem => modelItem.ElementAt(i).EmployeeId)
+                                @Html.HiddenFor(modelItem => modelItem.ElementAt(i).EmployeeName)
+                                @Html.HiddenFor(modelItem => modelItem.ElementAt(i).FollowId)
+                                <input type="submit" value="フォロー解除" class="btn" style="background :#7f4c3a;color:white" />
+                            }
 
-        <dd>
-            @Html.DisplayFor(model => model.FollowId)
-        </dd>
-
-    </dl>
-
-    @using (Html.BeginForm()) {
-        @Html.AntiForgeryToken()
-
-        <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
-        </div>
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
     }
+</table>
+
+<div>
+    @Html.ActionLink("フォロー一覧に戻る", "Index")
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

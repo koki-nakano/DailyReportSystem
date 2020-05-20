@@ -17,7 +17,7 @@ namespace DailyReportSystem
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 //フォロー機能作成中Home->Follow
-                defaults: new { controller = "Follows", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "Reports", action = "Index", id = UrlParameter.Optional }
             );
         }
     }
